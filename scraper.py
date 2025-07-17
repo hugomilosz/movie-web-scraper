@@ -19,13 +19,16 @@ class Scraper:
         except requests.exceptions.RequestException as e:
             print(f"  Error making request to {url}: {e}")
             return None
+        
+    def scrape_yearly_movies(self, year: int, top_n: Optional[int] = None, bottom_n: Optional[int] = None) -> List[Dict[str, Any]]:
+        """
+        Scrapes a list of movies for a given year from Box Office Mojo.
+        """
+        limit_str = f"top {top_n}" if top_n else "all"
+        if bottom_n:
+            limit_str += f" & bottom {bottom_n}"
 
-    def scrape_yearly_movies(self, year: int, limit: Optional[int] = 10) -> List[Dict[str, Any]]:
-        """
-        Scrapes the list of movies for a given year from Box Office Mojo.
-        An optional limit can be passed to scrape only the top N movies.
-        """
-        print(f"\n--- Scraping movie list for {year} (limit: {limit or 'all'}) ---")
+        print(f"\n--- Scraping movie list for {year} ({limit_str}) ---")
         url = f"{BOX_OFFICE_MOJO_BASE_URL}/year/{year}/"
         html = self._make_request(url)
         if not html: return []
@@ -36,21 +39,35 @@ class Scraper:
             print(f"No data table found for year {year}")
             return []
             
-        movie_rows = table.find_all('tr')[1:]
+        all_rows = table.find_all('tr')[1:]
         
-        if limit:
-            movie_rows = movie_rows[:limit]
-            
-        for row in movie_rows:
+        rows_to_process = []
+        if top_n:
+            rows_to_process.extend(all_rows[:top_n])
+        if bottom_n:
+            # Add the last n rows
+            rows_to_process.extend(all_rows[-bottom_n:])
+        
+        # If no limits were specified, process all rows
+        if not top_n and not bottom_n:
+            rows_to_process = all_rows
+        
+        processed_links = set()
+        for row in rows_to_process:
             movie_details = {}
             
             cols = row.find_all('td')
-            if len(cols) >= 10 and (link := cols[1].find('a')):
+            if len(cols) >= 10 and (link := cols[1].find('a', href=True)):
+                # Use the link's href to prevent processing duplicates
+                href = link['href']
+                if href in processed_links:
+                    continue
+                processed_links.add(href)
+                
                 title = link.text.strip()
                 print(f"  Processing: {title}")
                 
-                # Scrape details and update the new dictionary
-                mojo_url = BOX_OFFICE_MOJO_BASE_URL + link.get('href')
+                mojo_url = BOX_OFFICE_MOJO_BASE_URL + href
                 mojo_data = self._scrape_movie_details_mojo(mojo_url)
                 movie_details.update(mojo_data)
                 
@@ -58,7 +75,6 @@ class Scraper:
                     imdb_details = self._scrape_movie_details_imdb(imdb_id)
                     movie_details.update(imdb_details)
                 
-                # Add data from the main table and update again
                 movie_details.update({
                     'title': title,
                     'domestic_gross': cols[7].text.strip(),
@@ -68,7 +84,8 @@ class Scraper:
                 
                 movies.append(movie_details)
         return movies
-        
+
+    
     def _scrape_movie_details_mojo(self, url: str) -> Dict[str, Any]:
         """Scrapes details for a single movie from its Box Office Mojo page."""
         html = self._make_request(url)

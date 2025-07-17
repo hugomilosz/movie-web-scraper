@@ -9,14 +9,14 @@ def main():
     scraper = Scraper()
     db_manager = DatabaseManager(DB_PATH)
 
-    # Define the year range and limit of films to scrape
-    start_year = 2001
-    end_year = 2003
-    MOVIES_PER_YEAR_LIMIT = 5
+    # Define the year range and range of films to scrape
+    start_year = 2010
+    end_year = 2020
+    top_n, bottom_n = 3, 3
     
     all_raw_movies = []
     for year in range(start_year, end_year + 1):
-        yearly_movies = scraper.scrape_yearly_movies(year, limit=MOVIES_PER_YEAR_LIMIT)
+        yearly_movies = scraper.scrape_yearly_movies(year, top_n, bottom_n)
         all_raw_movies.extend(yearly_movies)
         
     print(f"\n--- Processing {len(all_raw_movies)} movies ---")
