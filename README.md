@@ -56,3 +56,25 @@ movie-web-scraper/
     ```
     The cleaned data will be saved in `movies.db`.
 
+***
+## Example Output
+
+A single record in the final `movies.db` database looks like this after being scraped and processed:
+
+| Field | Example Value |
+| :--- | :--- |
+| `imdb_id` | `tt1517268` |
+| `title` | `Barbie` |
+| `year` | `2023` |
+| `release_date` | `Jul 21` |
+| `distributor` | `Warner Bros.` |
+| `domestic_gross` | `636238421` |
+| `worldwide_gross`| `1445638421` |
+| `director` | `Greta Gerwig` |
+| `imdb_rating` | `6.9` |
+| `runtime_minutes`| `114` |
+| `poster_image_url`| `https://m.media-amazon.com/images/M/....jpg` |
+| `genres` | `Adventure, Comedy, Fantasy` |
+| `top_cast` | `Margot Robbie, Ryan Gosling, Issa Rae` |
+| `quality_issue` | `None` |
+
