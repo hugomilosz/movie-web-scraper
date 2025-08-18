@@ -6,6 +6,10 @@ from bs4 import BeautifulSoup
 from typing import List, Dict, Any, Optional
 from config import HEADERS, BOX_OFFICE_MOJO_BASE_URL, IMDB_BASE_URL
 
+# from youtube_sentiment import get_youtube_sentiment
+# from external_data import get_omdb_data
+from release_features import extract_release_features
+
 class Scraper:
     """Handles all web scraping operations."""
 
@@ -58,7 +62,6 @@ class Scraper:
             
             cols = row.find_all('td')
             if len(cols) >= 10 and (link := cols[1].find('a', href=True)):
-                # Use the link's href to prevent processing duplicates
                 href = link['href']
                 if href in processed_links:
                     continue
@@ -82,7 +85,18 @@ class Scraper:
                     'year': year
                 })
                 
+                # yt_data = get_youtube_sentiment(title, year)
+                # movie_details.update(yt_data)
+
+                # OMDb data (budget, sequel, franchise, etc.)
+                # omdb_data = get_omdb_data(title, year)
+                # movie_details.update(omdb_data)
+
+                # Release window features (month/season)
+                release_feats = extract_release_features(movie_details.get('release_date'))
+                movie_details.update(release_feats)
                 movies.append(movie_details)
+
         return movies
 
     

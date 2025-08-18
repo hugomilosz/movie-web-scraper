@@ -14,10 +14,27 @@ class DatabaseManager:
             cursor = conn.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS movies (
-                    imdb_id TEXT PRIMARY KEY, title TEXT, year INTEGER, release_date TEXT,
-                    distributor TEXT, domestic_gross INTEGER, worldwide_gross INTEGER,
-                    director TEXT, imdb_rating REAL, runtime_minutes INTEGER, poster_image_url TEXT,
-                    genres TEXT, top_cast TEXT, quality_issue TEXT
+                    imdb_id TEXT PRIMARY KEY,
+                    title TEXT,
+                    year INTEGER,
+                    release_date TEXT,
+                    distributor TEXT,
+                    domestic_gross INTEGER,
+                    worldwide_gross INTEGER,
+                    director TEXT,
+                    imdb_rating REAL,
+                    runtime_minutes INTEGER,
+                    poster_image_url TEXT,
+                    genres TEXT,
+                    top_cast TEXT,
+                    quality_issue TEXT,
+                    youtube_sentiment REAL,
+                    youtube_comment_count INTEGER,
+                    budget INTEGER,
+                    is_sequel BOOLEAN,
+                    franchise TEXT,
+                    release_month INTEGER,
+                    release_season TEXT
                 )
             ''')
             print("Database setup complete.")
@@ -39,7 +56,7 @@ class DatabaseManager:
             for movie in movies:
                 if 'imdb_id' not in movie: continue
                 
-                # Filter the movie dictionary to only include keys that are valid columns in our defined table
+                # Filter the movie dictionary to only include keys that are valid columns
                 movie_to_save = {k: v for k, v in movie.items() if k in valid_keys}
                 
                 cols = ', '.join(movie_to_save.keys())

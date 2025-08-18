@@ -10,9 +10,9 @@ def main():
     db_manager = DatabaseManager(DB_PATH)
 
     # Define the year range and range of films to scrape
-    start_year = 2010
-    end_year = 2020
-    top_n, bottom_n = 3, 3
+    start_year = 2019
+    end_year = 2019
+    top_n, bottom_n = 2, 2
     
     all_raw_movies = []
     for year in range(start_year, end_year + 1):
